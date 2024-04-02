@@ -51,7 +51,7 @@ public class LargePIDRecording implements RecordingGenerator {
 		try (Recording defaultRecording = Utils.createDefaultRecording(destinationFolder, recordingName, 1)) {
 			Type type = Utils.registerSystemProcess(defaultRecording);
 			Utils.writeSystemProcessEvent(defaultRecording, type, "Large PID Process",
-					Instant.now().minusSeconds(493).toEpochMilli(), 32434212L);
+					Instant.now().minusSeconds(493).toEpochMilli(), String.valueOf(32434212L));
 		}
 	}
 }

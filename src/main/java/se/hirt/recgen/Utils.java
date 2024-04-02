@@ -78,7 +78,7 @@ public class Utils {
 
 		Recording newRecording = Recordings.newRecording(location);
 		Type type = registerSystemProcess(newRecording);
-		writeSystemProcessEvent(newRecording, type, "System Process 1", now.minusSeconds(34).toEpochMilli(), 12L);
+		writeSystemProcessEvent(newRecording, type, "System Process 1", now.minusSeconds(34).toEpochMilli(), String.valueOf(4711L));
 		return newRecording;
 	}
 
@@ -97,7 +97,7 @@ public class Utils {
 	 *            the pid of the process.
 	 */
 	public static void writeSystemProcessEvent(
-		Recording newRecording, Type type, String commandLine, long startTime, long pid) {
+		Recording newRecording, Type type, String commandLine, long startTime, String pid) {
 		newRecording.writeEvent(type.asValue(b -> {
 			b.putField("startTime", startTime).putField("commandLine", commandLine).putField("pid", pid);
 		}));
@@ -114,7 +114,7 @@ public class Utils {
 	public static Type registerSystemProcess(Recording newRecording) {
 		return newRecording.registerEventType("jdk.SystemProcess", builder -> {
 			builder.addField("commandLine", TypesImpl.Builtin.STRING);
-			builder.addField("pid", TypesImpl.Builtin.LONG);
+			builder.addField("pid", TypesImpl.Builtin.STRING);
 		});
 	}
 }
