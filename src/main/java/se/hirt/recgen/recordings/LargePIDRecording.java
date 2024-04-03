@@ -50,6 +50,8 @@ public class LargePIDRecording implements RecordingGenerator {
 	public void generateRecording(File destinationFolder, String recordingName) throws IOException {
 		try (Recording defaultRecording = Utils.createDefaultRecording(destinationFolder, recordingName, 32434212L)) {
 			Type type = Utils.registerSystemProcess(defaultRecording);
+			Utils.writeSystemProcessEvent(defaultRecording, type, "Very long command line for the process running JMC...",
+					Instant.now().minusSeconds(493).toEpochMilli(), String.valueOf(32434212L));
 			Utils.writeSystemProcessEvent(defaultRecording, type, "Large PID Process",
 					Instant.now().minusSeconds(493).toEpochMilli(), String.valueOf(32434213L));
 		}
