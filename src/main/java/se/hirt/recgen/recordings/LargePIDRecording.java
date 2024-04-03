@@ -48,10 +48,10 @@ public class LargePIDRecording implements RecordingGenerator {
 
 	@Override
 	public void generateRecording(File destinationFolder, String recordingName) throws IOException {
-		try (Recording defaultRecording = Utils.createDefaultRecording(destinationFolder, recordingName, 1)) {
+		try (Recording defaultRecording = Utils.createDefaultRecording(destinationFolder, recordingName, 32434212L)) {
 			Type type = Utils.registerSystemProcess(defaultRecording);
 			Utils.writeSystemProcessEvent(defaultRecording, type, "Large PID Process",
-					Instant.now().minusSeconds(493).toEpochMilli(), String.valueOf(32434212L));
+					Instant.now().minusSeconds(493).toEpochMilli(), String.valueOf(32434213L));
 		}
 	}
 }

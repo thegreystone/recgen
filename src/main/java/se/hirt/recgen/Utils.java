@@ -77,16 +77,62 @@ public class Utils {
 		Instant now = Instant.now();
 
 		Recording newRecording = Recordings.newRecording(location);
-		Type type = registerSystemProcess(newRecording);
-		writeSystemProcessEvent(newRecording, type, "System Process 1", now.minusSeconds(34).toEpochMilli(), String.valueOf(4711L));
+		Type type = registerJVMInformation(newRecording);
+		writeJVMInformationEvent(newRecording, type, pid, now);
+		type = registerSystemProcess(newRecording);
+		writeSystemProcessEvent(newRecording, type, "My System Process", now.minusSeconds(34).toEpochMilli(),
+				String.valueOf(4711L));
 		return newRecording;
+	}
+
+	/**
+	 * We're simply going to simulate a JMC running. ;)
+	 * 
+	 * @param newRecording
+	 *            the {@link Recording} to write the event to.
+	 * @param type
+	 *            the type for jdk.JVMInformation
+	 * @param pid
+	 *            the pid to use for the recorded process. Yup, it's a long for the JVMInformation
+	 *            event, but a string for the SystemProcess events. :'(
+	 * @param now
+	 */
+	private static void writeJVMInformationEvent(Recording newRecording, Type type, long pid, Instant now) {
+		newRecording.writeEvent(type.asValue(b -> {
+			b.putField("startTime", now.toEpochMilli()).putField("pid", pid)
+			.putField("jvmName", "Java HotSpot(TM) 64-Bit Server VM")
+			.putField("jvmVersion", "Java HotSpot(TM) 64-Bit Server VM (17.0.9+11-LTS-201) for windows-amd64 JRE (17.0.9+11-LTS-201), built on Oct 10 2023 23:16:06 by \"mach5one\" with MS VC++ 17.1 (VS2022)")
+			.putField("jvmArguments", "-XX:+UseG1GC -XX:+FlightRecorder -XX:StartFlightRecording=name=JMC_Default,maxsize=100m -Djava.net.preferIPv4Stack=true -Djdk.attach.allowAttachSelf=true --add-exports=java.xml/com.sun.org.apache.xerces.internal.parsers=ALL-UNNAMED --add-exports=jdk.internal.jvmstat/sun.jvmstat.monitor=ALL-UNNAMED --add-exports=java.management/sun.management=ALL-UNNAMED --add-exports=jdk.management.agent/jdk.internal.agent=ALL-UNNAMED --add-exports=jdk.attach/sun.tools.attach=ALL-UNNAMED --add-exports=java.desktop/sun.awt.windows=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED -Dorg.eclipse.swt.internal.carbon.smallFonts -Declipse.pde.launch=true --add-modules=ALL-SYSTEM -Djava.security.manager=allow -Dfile.encoding=UTF-8 -Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8 -XX:+ShowCodeDetailsInExceptionMessages")
+			.putField("jvmFlags", "")
+			.putField("javaArguments", "org.eclipse.equinox.launcher.Main -launcher C:\\Users\\Marcus\\workspaces\\2023-12\\jmc_fork\\.metadata\\.plugins\\org.eclipse.pde.core\\.bundle_pool\\eclipse.exe -name Eclipse -showsplash 600 -product org.openjdk.jmc.rcp.application.product -data C:\\Users\\Marcus\\workspaces\\2023-12\\jmc_fork/../jmc_rcp -configuration file:C:/Users/Marcus/workspaces/2023-12/jmc_fork/.metadata/.plugins/org.eclipse.pde.core/JMC-RCP/ -dev file:C:/Users/Marcus/workspaces/2023-12/jmc_fork/.metadata/.plugins/org.eclipse.pde.core/JMC-RCP/dev.properties -os win32 -ws win32 -arch x86_64 -nl en_US -consoleLog");
+		}));
+	}
+
+	/**
+	 * Registers the jdk.JVMInformation event with the recording.
+	 * 
+	 * @param newRecording
+	 *            the {@link Recording} to register the system process event type to. Will return
+	 *            the existing one if already registered.
+	 * @return the {@link Type} for the jdk.JVMInformation event.
+	 */
+	private static Type registerJVMInformation(Recording newRecording) {
+		return newRecording.registerEventType("jdk.JVMInformation", builder -> {
+			builder.addField("jvmName", TypesImpl.Builtin.STRING);
+			builder.addField("jvmVersion", TypesImpl.Builtin.STRING);
+			builder.addField("jvmArguments", TypesImpl.Builtin.STRING);
+			builder.addField("jvmFlags", TypesImpl.Builtin.STRING);
+			builder.addField("javaArguments", TypesImpl.Builtin.STRING);
+			builder.addField("jvmStartTime", TypesImpl.Builtin.STRING);
+			builder.addField("pid", TypesImpl.Builtin.LONG);
+		});
 	}
 
 	/**
 	 * Writes a jdk.SystemProcess event.
 	 * 
 	 * @param newRecording
-	 *            the {@link Recording} to write to.
+	 *            the {@link Recording} to write the event to.
 	 * @param type
 	 *            the system process type.
 	 * @param commandLine
