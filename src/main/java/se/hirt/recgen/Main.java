@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 
 import se.hirt.recgen.recordings.LargePIDRecording;
+import se.hirt.recgen.recordings.PID1Recording;
 
 /**
  * Entry point.
@@ -58,5 +59,6 @@ public class Main {
 			System.exit(3);
 		}
 		new LargePIDRecording().generateRecording(dir, "largepid.jfr");
+		new PID1Recording().generateRecording(dir, "pid1.jfr");
 	}
 }
